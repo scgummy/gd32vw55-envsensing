@@ -50,7 +50,7 @@
       link_standard_libraries_configuration_prefix=""
       link_standard_libraries_directory=""
       link_use_linker_script_file="Yes"
-      linker_additional_files="$(LibCDir)/libc.a;$(LibCDir)/libc_nano.a;$(LibCDir)/libm.a;$(LibCDir)/libnosys.a;$(LibGccDir)/libgcc.a;$(MsdkDir)/lib/libble_max.a;$(MsdkDir)/lib/librf.a;$(MsdkDir)/plf/riscv/NMSIS/Library/DSP/GCC/libnmsis_dsp_rv32imafcbp.a"
+      linker_additional_files="$(LibCDir)/libc.a;$(LibCDir)/libc_nano.a;$(LibCDir)/libm.a;$(LibCDir)/libnosys.a;$(LibGccDir)/libgcc.a;$(MsdkDir)/lib/libble_min.a;$(MsdkDir)/lib/librf.a;$(MsdkDir)/plf/riscv/NMSIS/Library/DSP/GCC/libnmsis_dsp_rv32imafcbp.a"
       linker_memory_map_file=""
       linker_output_format="bin"
       linker_printf_fp_enabled="Double"
