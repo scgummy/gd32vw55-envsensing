@@ -1,6 +1,6 @@
 <!DOCTYPE CrossStudio_Project_File>
-<solution Name="BLE_APP_UART" version="2" target="20">
-  <project Name="BLE_APP_UART">
+<solution Name="BLE_APP_ES" version="2" target="20">
+  <project Name="BLE_APP_ES">
     <configuration
       BUILD_OPTIONS="None"
       LIBRARY_HEAP_TYPE="None"
@@ -40,7 +40,7 @@
       gcc_optimization_level="Level 2 for size"
       gcc_short_enum="None"
       gcc_signed_char="Yes"
-      gcc_target="andes-riscv32-none-elf"
+      gcc_target="riscv32-none-elf"
       gcc_uninitialized_variables_warning="No"
       gcc_use_cxa_at_exit="No"
       is_cpp_project="No"
