@@ -52,7 +52,7 @@
       gcc_optimization_level="Level 2 for size"
       gcc_sign_compare_warning="Yes"
       gcc_strict_prototypes_warning="Yes"
-      gcc_target="riscv-nuclei-elf"
+      gcc_target="andes-riscv32-none-elf"
       gcc_uninitialized_variables_warning="Yes"
       gcc_unused_variable_warning="No"
       is_cpp_project="No"
@@ -60,21 +60,21 @@
       link_linker_script_file="$(ProjectDir)/mbl.lds"
       link_standard_libraries_directory="$(StudioLibDir:$(StudioDir)/lib)"
       link_use_linker_script_file="Yes"
-      linker_additional_files="$(LibCDir)/libc_nano.a;$(LibCDir)/libnosys.a"
+      linker_additional_files="$(LibGccDir)/libgcc.a;$(LibCDir)/libc_nano.a;$(LibCDir)/libnosys.a"
       linker_output_format="bin"
       linker_patch_build_command_wd="$(ProjectDir)"
       linker_printf_fp_enabled="Double"
       linker_scanf_fp_enabled="Yes"
       macros="DeviceFamily=GD32VW55x;DeviceSubFamily=GD32VW553;Target=GD32VW553HMQ7;RootDir=$(ProjectDir)/../../../..;VendorDir=$(RootDir)/vendor;MsdkDir=$(VendorDir)/MSDK;LibGccDir=/usr/lib/gcc/riscv64-elf/14.1.0/rv32imafc/ilp32f;LibCDir=/usr/riscv32-elf/lib/rv32imafc/ilp32f"
-      post_build_command="cmd /C &quot;..\..\..\..\mbl_afterbuild.bat  riscv-nuclei-elf- ..\..\..\..\..\..\ ECDSA256 CERT D:\tools\eclipse_tool\OpenOCD_2022.4.6 &quot;00ffeeddccbbaa998877665544332211&quot; &quot;"
-      post_build_command_wd="$(ProjectDir)\Output\Common\Exe"
-      pre_build_command="cmd /C &quot;..\..\mbl_prebuild.bat riscv-nuclei-elf-&quot;"
+      post_build_command="../../../../mbl_afterbuild.sh $(GCCTarget) ../../../../../../ ECDSA256 CERT D:\tools\eclipse_tool\OpenOCD_2022.4.6 00ffeeddccbbaa998877665544332211"
+      post_build_command_wd="$(ProjectDir)/Output/Common/Exe"
+      pre_build_command="../../mbl_prebuild.sh $(StudioDir)/gcc/$(GCCTarget)/bin/$(GCCPrefix)"
       pre_build_command_control="Always Run"
-      pre_build_command_wd="$(ProjectDir)\Output"
+      pre_build_command_wd="$(ProjectDir)/Output"
       project_type="Executable"
       property_groups_file_path=""
       rv_abi="ilp32f"
-      rv_arch_ext="bp"
+      rv_arch_ext=""
       rv_arch_zicsr="No"
       rv_arch_zifencei="No"
       rv_arch_zmmul="No"
@@ -91,6 +91,7 @@
     </folder>
     <folder Name="platform">
       <file file_name="$(MsdkDir)/plf/riscv/env/entry.S" />
+      <file file_name="$(MsdkDir)/plf/riscv/env/env_init.c" />
       <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_eclic.c" />
       <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_fmc.c" />
       <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_gpio.c" />
@@ -99,7 +100,6 @@
       <file file_name="$(MsdkDir)/plf/riscv/env/handlers.c">
         <configuration Name="Common" gcc_enable_all_warnings="No" />
       </file>
-      <file file_name="$(MsdkDir)/plf/riscv/env/env_init.c" />
       <file file_name="$(MsdkDir)/plf/src/init_rom_symbol.c" />
       <file file_name="$(MsdkDir)/plf/riscv/arch/lib/lib_hook_mbl.c">
         <configuration Name="Common" gcc_enable_all_warnings="No" />
