@@ -32,12 +32,12 @@
       Name="Common"
       Target="GD32VW553HMQ7"
       arm_compiler_variant="gcc"
-      arm_linker_symbols_files="$(ProjectDir)/../../../ROM-EXPORT/symbol/rom_symbol_m.gcc"
+      arm_linker_symbols_files="$(VendorDir)/ROM-EXPORT/symbol/rom_symbol_m.gcc"
       arm_linker_treat_warnings_as_errors="Yes"
       arm_linker_variant="GNU"
       c_preprocessor_definitions="GD32VW553HM;__GD32VW553_SUBFAMILY;__GD32VW55X_FAMILY;EXEC_USING_STD_PRINTF"
-      c_system_include_directories="$(ToolChainDir)/../lib/10.2.0/include;$(ToolChainDir)/../lib/10.2.0/include-fixed;$(ToolChainDir)/../include"
-      c_user_include_directories="$(ProjectDir)/../../../config;$(ProjectDir)/../../../ROM-EXPORT/bootloader;$(ProjectDir)/../../../ROM-EXPORT/halcomm;$(ProjectDir)/../../../ROM-EXPORT/mbedtls-2.17.0-rom/include;$(ProjectDir)/../../../MSDK/plf/riscv/gd32vw55x;$(ProjectDir)/../../../MSDK/plf/riscv/NMSIS/Core/Include;$(ProjectDir)/../../../MSDK/plf/GD32VW55x_standard_peripheral/Include;$(ProjectDir)/../../../MSDK/plf/GD32VW55x_standard_peripheral;$(ProjectDir)/../../../MSDK/plf/src;$(ProjectDir)/../../../MSDK/macsw/export;$(ProjectDir)/../../../MSDK/app;$(ProjectDir)/../../mainboot/"
+      c_system_include_directories="$(StudioDir)/include"
+      c_user_include_directories="$(VendorDir)/config;$(VendorDir)/ROM-EXPORT/bootloader;$(VendorDir)/ROM-EXPORT/halcomm;$(VendorDir)/ROM-EXPORT/mbedtls-2.17.0-rom/include;$(MsdkDir)/plf/riscv/gd32vw55x;$(MsdkDir)/plf/riscv/NMSIS/Core/Include;$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Include;$(MsdkDir)/plf/GD32VW55x_standard_peripheral;$(MsdkDir)/plf/src;$(MsdkDir)/macsw/export;$(MsdkDir)/app;$(VendorDir)/mainboot"
       debug_enable_RTT="No"
       debug_register_definition_file="$(ProjectDir)/GD32VW553x_Registers.xml"
       debug_stack_pointer_start="_sp"
@@ -60,12 +60,12 @@
       link_linker_script_file="$(ProjectDir)/mbl.lds"
       link_standard_libraries_directory="$(StudioLibDir:$(StudioDir)/lib)"
       link_use_linker_script_file="Yes"
-      linker_additional_files="$(ToolChainDir)/../lib/rv32imafcbp/ilp32f/libc_nano.a;$(ToolChainDir)/../lib/rv32imafcbp/ilp32f/libnosys.a"
+      linker_additional_files="$(LibCDir)/libc_nano.a;$(LibCDir)/libnosys.a"
       linker_output_format="bin"
       linker_patch_build_command_wd="$(ProjectDir)"
       linker_printf_fp_enabled="Double"
       linker_scanf_fp_enabled="Yes"
-      macros="DeviceFamily=GD32VW55x;DeviceSubFamily=GD32VW553;Target=GD32VW553HMQ7"
+      macros="DeviceFamily=GD32VW55x;DeviceSubFamily=GD32VW553;Target=GD32VW553HMQ7;RootDir=$(ProjectDir)/../../../..;VendorDir=$(RootDir)/vendor;MsdkDir=$(VendorDir)/MSDK;LibGccDir=/usr/lib/gcc/riscv64-elf/14.1.0/rv32imafc/ilp32f;LibCDir=/usr/riscv32-elf/lib/rv32imafc/ilp32f"
       post_build_command="cmd /C &quot;..\..\..\..\mbl_afterbuild.bat  riscv-nuclei-elf- ..\..\..\..\..\..\ ECDSA256 CERT D:\tools\eclipse_tool\OpenOCD_2022.4.6 &quot;00ffeeddccbbaa998877665544332211&quot; &quot;"
       post_build_command_wd="$(ProjectDir)\Output\Common\Exe"
       pre_build_command="cmd /C &quot;..\..\mbl_prebuild.bat riscv-nuclei-elf-&quot;"
@@ -84,28 +84,28 @@
       target_device_name="GD32VW553HMQ7"
       target_interface_type="JTAG"
       target_reset_script="Reset();"
-      target_script_file="$(ProjectDir)/../../../MSDK/projects/segger/GD32VW55x_Target.js" />
+      target_script_file="$(MsdkDir)/projects/segger/GD32VW55x_Target.js" />
     <folder Name="mainboot">
       <file file_name="../../mainboot/mbl.c" />
       <file file_name="../../mainboot/mbl_image_validate.c" />
     </folder>
     <folder Name="platform">
-      <file file_name="../../../MSDK/plf/riscv/env/entry.S" />
-      <file file_name="../../../MSDK/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_eclic.c" />
-      <file file_name="../../../MSDK/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_fmc.c" />
-      <file file_name="../../../MSDK/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_gpio.c" />
-      <file file_name="../../../MSDK/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_rcu.c" />
-      <file file_name="../../../MSDK/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_usart.c" />
-      <file file_name="../../../MSDK/plf/riscv/env/handlers.c">
+      <file file_name="$(MsdkDir)/plf/riscv/env/entry.S" />
+      <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_eclic.c" />
+      <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_fmc.c" />
+      <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_gpio.c" />
+      <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_rcu.c" />
+      <file file_name="$(MsdkDir)/plf/GD32VW55x_standard_peripheral/Source/gd32vw55x_usart.c" />
+      <file file_name="$(MsdkDir)/plf/riscv/env/handlers.c">
         <configuration Name="Common" gcc_enable_all_warnings="No" />
       </file>
-      <file file_name="../../../MSDK/plf/riscv/env/env_init.c" />
-      <file file_name="../../../MSDK/plf/src/init_rom_symbol.c" />
-      <file file_name="../../../MSDK/plf/riscv/arch/lib/lib_hook_mbl.c">
+      <file file_name="$(MsdkDir)/plf/riscv/env/env_init.c" />
+      <file file_name="$(MsdkDir)/plf/src/init_rom_symbol.c" />
+      <file file_name="$(MsdkDir)/plf/riscv/arch/lib/lib_hook_mbl.c">
         <configuration Name="Common" gcc_enable_all_warnings="No" />
       </file>
-      <file file_name="../../../MSDK/plf/riscv/env/start.S" />
-      <file file_name="../../../MSDK/plf/riscv/gd32vw55x/system_gd32vw55x.c" />
+      <file file_name="$(MsdkDir)/plf/riscv/env/start.S" />
+      <file file_name="$(MsdkDir)/plf/riscv/gd32vw55x/system_gd32vw55x.c" />
     </folder>
   </project>
 </solution>
