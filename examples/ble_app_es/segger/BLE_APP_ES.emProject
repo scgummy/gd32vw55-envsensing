@@ -75,7 +75,8 @@
       target_script_file="$(MsdkDir)/projects/segger/GD32VW55x_Target.js"
       use_compiler_driver="No" />
     <folder Name="app">
-      <file file_name="../app_uart.c" />
+      <file file_name="../app_es.c" />
+      <file file_name="../ble_es_srv.c" />
       <file file_name="../main.c" />
       <file file_name="segger_shim.c" />
     </folder>
