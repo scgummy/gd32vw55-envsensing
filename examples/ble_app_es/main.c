@@ -512,7 +512,7 @@ int main(void)
     platform_init();
     app_es_init();
     // ble_init();
-    app_es_test();
+    // app_es_test();
     sys_os_start();
 
     for ( ; ; );
