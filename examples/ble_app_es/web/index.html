@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLE环境监测仪</title>
+    <style>
+        :root {
+            --primary: #4285f4;
+            --secondary: #34a853;
+            --error: #ea4335;
+            --background: #f5f5f5;
+            --card: #ffffff;
+            --text: #333333;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .card {
+            background-color: var(--card);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .data-display {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .data-item {
+            flex: 1;
+        }
+        
+        .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .unit {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .error {
+            color: var(--error);
+        }
+        
+        @media (max-width: 600px) {
+            .data-display {
+                flex-direction: column;
+            }
+            
+            .value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>BLE环境监测仪</h1>
+        <p>通过BME280传感器实时监测气压、温度和湿度</p>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <div class="controls">
+                <button id="connectBtn">连接设备</button>
+                <button id="disconnectBtn" disabled>断开连接</button>
+            </div>
+            <p id="status" class="status">等待连接...</p>
+        </div>
+        
+        <div class="card">
+            <h2>实时数据</h2>
+            <div class="data-display">
+                <div class="data-item">
+                    <h3>气压</h3>
+                    <div class="value" id="pressureValue">--</div>
+                    <div class="unit">hPa</div>
+                </div>
+                <div class="data-item">
+                    <h3>温度</h3>
+                    <div class="value" id="temperatureValue">--</div>
+                    <div class="unit">°C</div>
+                </div>
+                <div class="data-item">
+                    <h3>湿度</h3>
+                    <div class="value" id="humidityValue">--</div>
+                    <div class="unit">%RH</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>历史趋势</h2>
+            <div class="chart-container">
+                <canvas id="dataChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 标准环境监测服务UUID
+        const ENV_SERVICE_UUID = 0x181A;
+        const PRESSURE_CHAR_UUID = 0x2A6D;    // 气压
+        const TEMPERATURE_CHAR_UUID = 0x2A6E; // 温度
+        const HUMIDITY_CHAR_UUID = 0x2A6F;   // 湿度
+        
+        // DOM元素
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const statusText = document.getElementById('status');
+        const pressureValue = document.getElementById('pressureValue');
+        const temperatureValue = document.getElementById('temperatureValue');
+        const humidityValue = document.getElementById('humidityValue');
+        
+        // 图表和数据存储
+        let dataChart;
+        const maxDataPoints = 100;
+        let pressureData = [];
+        let temperatureData = [];
+        let humidityData = [];
+        let timeLabels = [];
+        let device;
+        let pressureChar;
+        let temperatureChar;
+        let humidityChar;
+        
+        // 初始化图表
+        function initChart() {
+            const ctx = document.getElementById('dataChart').getContext('2d');
+            
+            dataChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [
+                        {
+                            label: '气压 (hPa)',
+                            data: pressureData,
+                            borderColor: '#4285f4',
+                            backgroundColor: 'rgba(66, 133, 244, 0.1)',
+                            borderWidth: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '温度 (°C)',
+                            data: temperatureData,
+                            borderColor: '#ea4335',
+                            backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: '湿度 (%RH)',
+                            data: humidityData,
+                            borderColor: '#34a853',
+                            backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                            borderWidth: 2,
+                            yAxisID: 'y2'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '时间'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '气压 (hPa)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '温度 (°C)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '湿度 (%RH)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 0
+                    }
+                }
+            });
+        }
+        
+        // 添加新数据点
+        function addDataPoint(pressure, temperature, humidity) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            
+            // 添加新数据
+            pressureData.push(pressure);
+            temperatureData.push(temperature);
+            humidityData.push(humidity);
+            timeLabels.push(timeStr);
+            
+            // 限制数据点数量
+            if (pressureData.length > maxDataPoints) {
+                pressureData.shift();
+                temperatureData.shift();
+                humidityData.shift();
+                timeLabels.shift();
+            }
+            
+            // 更新图表
+            dataChart.update();
+        }
+        
+        // 连接设备
+        async function connectToDevice() {
+            try {
+                statusText.textContent = "正在搜索设备...";
+                
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'GD-BLE' }],
+                    optionalServices: [ENV_SERVICE_UUID]
+                });
+                
+                device.addEventListener('gattserverdisconnected', onDisconnected);
+                
+                statusText.textContent = "正在连接...";
+                const server = await device.gatt.connect();
+                
+                statusText.textContent = "获取服务...";
+                const service = await server.getPrimaryService(ENV_SERVICE_UUID);
+                
+                statusText.textContent = "获取特性...";
+                pressureChar = await service.getCharacteristic(PRESSURE_CHAR_UUID);
+                temperatureChar = await service.getCharacteristic(TEMPERATURE_CHAR_UUID);
+                humidityChar = await service.getCharacteristic(HUMIDITY_CHAR_UUID);
+                
+                // 启用通知
+                await pressureChar.startNotifications();
+                await temperatureChar.startNotifications();
+                await humidityChar.startNotifications();
+                
+                pressureChar.addEventListener('characteristicvaluechanged', handlePressureChange);
+                temperatureChar.addEventListener('characteristicvaluechanged', handleTemperatureChange);
+                humidityChar.addEventListener('characteristicvaluechanged', handleHumidityChange);
+                
+                // 启用UI控件
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                
+                statusText.textContent = `已连接: ${device.name || '未知设备'}`;
+                
+                // 初始化图表
+                if (!dataChart) {
+                    initChart();
+                }
+                
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = `错误: ${error.message}`;
+                statusText.classList.add('error');
+                setTimeout(() => {
+                    statusText.classList.remove('error');
+                    statusText.textContent = "等待连接...";
+                }, 3000);
+            }
+        }
+        
+        // 断开连接
+        async function disconnectDevice() {
+            if (!device) return;
+            
+            try {
+                if (device.gatt.connected) {
+                    if (pressureChar) await pressureChar.stopNotifications();
+                    if (temperatureChar) await temperatureChar.stopNotifications();
+                    if (humidityChar) await humidityChar.stopNotifications();
+                    device.gatt.disconnect();
+                }
+                
+                onDisconnected();
+                
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = `断开连接错误: ${error.message}`;
+                statusText.classList.add('error');
+            }
+        }
+        
+        // 断开连接处理
+        function onDisconnected() {
+            device = null;
+            pressureChar = null;
+            temperatureChar = null;
+            humidityChar = null;
+            
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            
+            statusText.textContent = "设备已断开";
+            setTimeout(() => {
+                statusText.textContent = "等待连接...";
+            }, 2000);
+        }
+        
+        // 气压变化处理
+        function handlePressureChange(event) {
+            const value = event.target.value;
+            // 气压数据是UINT32，单位0.01Pa，转换为hPa需要除以100
+            const pressure = value.getUint32(0, true) / 100.0;
+            pressureValue.textContent = pressure.toFixed(2);
+        }
+        
+        // 温度变化处理
+        function handleTemperatureChange(event) {
+            const value = event.target.value;
+            // 温度数据是INT16，单位0.01°C
+            const temperature = value.getInt16(0, true) / 100.0;
+            temperatureValue.textContent = temperature.toFixed(2);
+        }
+        
+        // 湿度变化处理
+        function handleHumidityChange(event) {
+            const value = event.target.value;
+            // 湿度数据是UINT16，单位0.01%RH
+            const humidity = value.getUint16(0, true) / 100.0;
+            humidityValue.textContent = humidity.toFixed(2);
+            
+            // 如果三个值都收到了，添加到图表
+            if (pressureValue.textContent !== '--' && temperatureValue.textContent !== '--') {
+                addDataPoint(
+                    parseFloat(pressureValue.textContent),
+                    parseFloat(temperatureValue.textContent),
+                    parseFloat(humidityValue.textContent)
+                );
+            }
+        }
+        
+        // 事件监听
+        connectBtn.addEventListener('click', connectToDevice);
+        disconnectBtn.addEventListener('click', disconnectDevice);
+        
+        // 检查Web Bluetooth API支持
+        if (!navigator.bluetooth) {
+            statusText.textContent = "您的浏览器不支持Web Bluetooth API";
+            statusText.classList.add('error');
+            connectBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>

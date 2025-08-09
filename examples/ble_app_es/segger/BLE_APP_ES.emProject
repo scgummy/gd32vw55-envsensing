@@ -49,6 +49,7 @@
       link_linker_script_file="$(MsdkDir)/examples/ble/gd32vw55x_example.lds"
       link_standard_libraries_configuration_prefix=""
       link_standard_libraries_directory=""
+      link_time_optimization="Yes"
       link_use_linker_script_file="Yes"
       linker_additional_files="$(LibCDir)/libc.a;$(LibCDir)/libc_nano.a;$(LibCDir)/libm.a;$(LibCDir)/libnosys.a;$(LibGccDir)/libgcc.a;$(MsdkDir)/lib/libble_min.a;$(MsdkDir)/lib/librf.a;$(MsdkDir)/plf/riscv/NMSIS/Library/DSP/GCC/libnmsis_dsp_rv32imafcbp.a"
       linker_memory_map_file=""

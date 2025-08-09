@@ -79,7 +79,7 @@ char dev_name[] = {DEV_NAME};
 app_adv_param_t app_adv_env = {0};
 
 /* connection index */
-uint8_t conn_idx = 0;
+uint8_t conn_idx = UINT8_MAX;
 
 /*!
     \brief      Start advertising
@@ -511,8 +511,7 @@ int main(void)
     sys_os_init();
     platform_init();
     app_es_init();
-    // ble_init();
-    // app_es_test();
+    ble_init();
     sys_os_start();
 
     for ( ; ; );

@@ -113,18 +113,21 @@ ble_status_t ble_es_srv_deinit(void)
 
 ble_status_t ble_es_srv_send_pressure(uint8_t conn_idx, float value)
 {
+    uint32_t converted = (uint32_t) (value * 100.0f);
     return ble_gatts_ntf_ind_send(conn_idx, svc_id, BLE_ES_SRV_IDX_PRESSURE_CHAR_VAL,
-                                  (void *) &value, sizeof(value), BLE_GATT_NOTIFY);
+                                  (void *) &converted, sizeof(converted), BLE_GATT_NOTIFY);
 }
 
 ble_status_t ble_es_srv_send_temperature(uint8_t conn_idx, float value)
 {
+    int16_t converted = (int16_t) (value * 100.0f);
     return ble_gatts_ntf_ind_send(conn_idx, svc_id, BLE_ES_SRV_IDX_TEMPERATURE_CHAR_VAL,
-                                  (void *) &value, sizeof(value), BLE_GATT_NOTIFY);
+                                  (void *) &converted, sizeof(converted), BLE_GATT_NOTIFY);
 }
 
 ble_status_t ble_es_srv_send_humidity(uint8_t conn_idx, float value)
 {
+    uint16_t converted = (uint16_t) (value * 100.0f);
     return ble_gatts_ntf_ind_send(conn_idx, svc_id, BLE_ES_SRV_IDX_HUMIDITY_CHAR_VAL,
-                                  (void *) &value, sizeof(value), BLE_GATT_NOTIFY);
+                                  (void *) &converted, sizeof(converted), BLE_GATT_NOTIFY);
 }
