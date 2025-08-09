@@ -42,8 +42,8 @@ OF SUCH DAMAGE.
 #include "ble_utils.h"
 #include "ble_export.h"
 #include "ble_sec.h"
-#include "ble_datatrans_srv.h"
-#include "app_uart.h"
+#include "ble_es_srv.h"
+#include "app_es.h"
 
 /* Device name */
 #define DEV_NAME "GD-BLE-DEV"
@@ -478,7 +478,7 @@ void ble_init(void)
 
     param.role = BLE_GAP_ROLE_PERIPHERAL;
     param.keys_user_mgr = false;
-    param.pairing_mode = BLE_GAP_PAIRING_SECURE_CONNECTION | BLE_GAP_PAIRING_LEGACY;
+    param.pairing_mode = BLE_GAP_PAIRING_NO_BOND;
     param.privacy_cfg = BLE_GAP_PRIV_CFG_PRIV_EN_BIT;
     param.ble_task_stack_size = BLE_STACK_TASK_STACK_SIZE;
     param.ble_task_priority = BLE_STACK_TASK_PRIORITY;
@@ -493,8 +493,7 @@ void ble_init(void)
     app_adapter_init();
     app_conn_mgr_init();
     app_sec_mgr_init();
-    ble_datatrans_srv_init();
-    ble_datatrans_srv_rx_cb_reg(app_datatrans_srv_rx_callback);
+    ble_es_srv_init();
 
     /* The BLE interrupt must be enabled after ble_sw_init. */
     ble_irq_enable();
@@ -511,8 +510,9 @@ int main(void)
 {
     sys_os_init();
     platform_init();
-    app_uart_init();
-    ble_init();
+    app_es_init();
+    // ble_init();
+    app_es_test();
     sys_os_start();
 
     for ( ; ; );
